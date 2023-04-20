@@ -11,8 +11,20 @@ async function mainEvent() {
         try {
             const results = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
             const data = await results.json();
-            const instructors = data.map((section) => section.instructors);
-            prof_list.innerHTML = instructors.join(', ');
+            const instructors = 
+            data.map((section) => section.instructors).flat();
+            const numInstructors = {};
+            instructors.forEach((instructor) => {
+                if (numInstructors[instructor]) {
+                    numInstructors[instructor]++;
+                } else {
+                    numInstructors[instructor] = 1;
+                }
+            });
+            const listed = 
+            Object.entries(numInstructors).map(([instructor, number]) => `<li>${instructor} (${number} ${number > 1 ? 'sections' : 'section'})</li>`);
+            prof_list.innerHTML = listed.join(' ');
+            //`<ol>${listed.join('')}</ol>`;
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'

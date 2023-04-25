@@ -1,13 +1,13 @@
 
-function initChart (target){
+function initChart (target, labels, y_val){
 
   const chart = new Chart(target, {
     type: 'bar',
     data: {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+      labels: labels,
       datasets: [{
-        label: '# of Votes',
-        data: [12, 19, 3, 5, 2, 3],
+        label: '# of section(s)',
+        data: y_val,
         borderWidth: 1
       }]
     },
@@ -49,12 +49,16 @@ async function mainEvent() {
             Object.entries(numInstructors).map(([instructor, number]) => `<li>${instructor} (${number} ${number > 1 ? 'sections' : 'section'})</li>`);
             prof_list.innerHTML = listed.join(' ');
             //`<ol>${listed.join('')}</ol>`;
+
+            const labels = Object.keys(numInstructors);
+            const dataForChart = Object.values(numInstructors);
+            initChart(chart,labels,dataForChart);
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'
         }
     });
-    const newChart = initChart(chart);
+
 }
 
 document.addEventListener('DOMContentLoaded', async () => mainEvent());

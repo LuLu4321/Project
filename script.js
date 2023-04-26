@@ -51,6 +51,7 @@ async function mainEvent() {
     const input = document.querySelector('input');
     let prof_list = document.querySelector('.prof_list');
     const chart = document.querySelector('#myChart');
+    let myChart = null;
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -60,7 +61,12 @@ async function mainEvent() {
             const data = await response.json();
             const {labels,dataForChart,listed} = profs(data);
             prof_list.innerHTML = listed.join(' ');
-            initChart(chart,labels,dataForChart);
+            
+            if (myChart != null) {
+                myChart.destroy();
+            }
+
+            myChart = initChart(chart,labels,dataForChart);
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'

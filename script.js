@@ -1,10 +1,6 @@
 
-function profs(course_name){
-    return fetch(`https://api.umd.io/v1/courses/${course_name}/sections`).then(
-       (results) => {
-        const data = results.json();
-        return data;
-       }).then((data) => {
+function profs(data){
+
         const instructors = 
         data.map((section) => section.instructors).flat();
         const numInstructors = {};
@@ -23,7 +19,7 @@ function profs(course_name){
         return {labels: Object.keys(numInstructors),
             dataForChart: Object.values(numInstructors),
             listed: listed};
-       })
+
 }
 
 
@@ -60,7 +56,9 @@ async function mainEvent() {
         event.preventDefault();
         const course_name = input.value;
         try {
-            const {labels,dataForChart,listed} = await profs(course_name);
+            const response = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
+            const data = await response.json();
+            const {labels,dataForChart,listed} = profs(data);
             prof_list.innerHTML = listed.join(' ');
             initChart(chart,labels,dataForChart);
         } catch (error){

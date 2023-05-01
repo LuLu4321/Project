@@ -22,7 +22,6 @@ function profs(data){
 
 }
 
-
 function initChart (target, labels, y_val){
   const chart = new Chart(target, {
     type: 'bar',
@@ -44,31 +43,7 @@ function initChart (target, labels, y_val){
   });
   return chart;
 }
-/*
-function genEds(data){
-  const genEds = {};
-  data.forEach((section) => {
-    if (section.gen_ed) {
-    section.gen_ed.forEach((index) => {
-      if (genEds[index]) {
-        genEds[index]++;
-      } else {
-        genEds[index] = 1;
-      }
-    });
-    }
-  });
-  console.log('genEds: ', genEds);
-  const listed = Object.entries(genEds).map(([genEd_type, count]) =>
-  `<li>${genEd_type} (${count} ${count > 1 ? 'counts' : 'count'})</li>`
-  );
-  return {
-    labels: Object.keys(genEds),
-    dataForChart: Object.values(genEds),
-    listed: listed
-  };
-}
-*/
+
 function getMeetings(data){
   const getMeetings = data.reduce((accum, section) => {
     const meeting = section.meetings[0];
@@ -115,8 +90,6 @@ async function mainEvent() {
     const input = document.querySelector('input');
     let prof_list = document.querySelector('.prof_list');
     let meetings_list = document.querySelector('.meetings');
-    //let gen_ed_list = document.querySelector('.gen_ed_list');
-    //console.log('gen_ed_list after the querySelector: ', gen_ed_list);
     const chart = document.querySelector('#myChart');
     let myChart = null;
 
@@ -135,15 +108,6 @@ async function mainEvent() {
             = getMeetings(data)
             prof_list.innerHTML = profListed.join(' ');
             meetings_list.innerHTML = meetingListed.join(' ');
-            /* console.log('gen_ed_list before: ', gen_ed_list);
-            const {labels: genEdlabels, dataForChart: genEdData, listed: genEdlisted} 
-            = genEds(data);
-            console.log('gen_ed_list after: ', gen_ed_list);
-
-            if (gen_ed_list != null) {
-              gen_ed_list.innerHTML = genEdlisted.join(" ");
-            }
-            */
             
             if (myChart != null) {
                 myChart.destroy();

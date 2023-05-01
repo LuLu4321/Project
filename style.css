@@ -42,7 +42,7 @@ a {
   text-decoration: none;
 }
 
-h2, h3 {
+h2, h3, h4 {
   margin:0;
   padding:0;
   padding-bottom:1.5rem;
@@ -150,6 +150,12 @@ form {
 }
 
 .prof_list{
+  background-color: #fdf886;
+  padding: 1.5rem;
+  border: 2px solid;
+}
+
+.meetings{
   background-color: #fdf886;
   padding: 1.5rem;
   border: 2px solid;

@@ -77,22 +77,34 @@ function getMeetings(data){
     }
 
     const {days, start_time, end_time} = meeting;
-    const time = `${start_time.substring(0,5)}-${end_time.substring(0,5)}`;
-    days.split('').forEach((day) => {
-      const key = `${day}_${time}`;
-      if (accum[key]) {
-        accum[key]++;
-      } else {
-        accum[key] = 1;
+    const startHour = parseInt(start_time.substring(0, 2));
+    const endHour = parseInt(end_time.substring(0, 2));
+    const startSuffix = startHour >= 12 ? "pm" : "am";
+    const endSuffix = endHour >= 12 ? "pm" : "am";
+    const startTime = `${start_time.substring(0, 5)}${startSuffix}`;
+    const endTime = `${end_time.substring(0, 5)}${endSuffix}`;
+    const time = `${startTime}-${endTime}`;
+    if(accum[days]){
+      if(accum[days][time]){
+        accum[days][time]++;
+      }else{
+        accum[days][time] = 1;
       }
-    });
+    } else{
+      accum[days] = {[time]: 1};
+    }
     return accum;
-  },{});
+  
+  }, {});
   const labels = Object.keys(getMeetings);
-  const dataForChart = Object.values(getMeetings);
-  const listed = Object.entries(getMeetings).map(([key,count]) => {
-    const [day,time]=key.split('_');
-    return `<li>${day} ${time} (${count} ${count > 1 ? 'sections' : 'section'})</li>`
+  const dataForChart = Object.values(getMeetings).map((obj) => {
+    return Object.values(obj).reduce((sum,count) => sum + count, 0);
+  });
+  const listed = Object.entries(getMeetings).map(([days, obj]) => {
+    const times = Object.entries(obj).map(([time, count]) => {
+      return `${time} (${count} ${count > 1 ? "sections" : "section"})`;
+    }).join('<br>');
+    return `<li>${days}:<br>${times}\n</li>`;
   });
   return { labels, dataForChart, listed };
 }

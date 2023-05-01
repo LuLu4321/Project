@@ -69,13 +69,40 @@ function genEds(data){
   };
 }
 */
+function getMeetings(data){
+  const getMeetings = data.reduce((accum, section) => {
+    const meeting = section.meetings[0];
+    if (!meeting){
+      return accum;
+    }
 
+    const {days, start_time, end_time} = meeting;
+    const time = `${start_time.substring(0,5)}-${end_time.substring(0,5)}`;
+    days.split('').forEach((day) => {
+      const key = `${day}_${time}`;
+      if (accum[key]) {
+        accum[key]++;
+      } else {
+        accum[key] = 1;
+      }
+    });
+    return accum;
+  },{});
+  const labels = Object.keys(getMeetings);
+  const dataForChart = Object.values(getMeetings);
+  const listed = Object.entries(getMeetings).map(([key,count]) => {
+    const [day,time]=key.split('_');
+    return `<li>${day} ${time} (${count} ${count > 1 ? 'sections' : 'section'})</li>`
+  });
+  return { labels, dataForChart, listed };
+}
 
 async function mainEvent() {
 
     const form = document.querySelector('form');
     const input = document.querySelector('input');
     let prof_list = document.querySelector('.prof_list');
+    let meetings_list = document.querySelector('.meetings');
     //let gen_ed_list = document.querySelector('.gen_ed_list');
     //console.log('gen_ed_list after the querySelector: ', gen_ed_list);
     const chart = document.querySelector('#myChart');
@@ -88,9 +115,14 @@ async function mainEvent() {
             const response = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
             const data = await response.json();
             console.log(data);
-            const {labels,dataForChart,listed} = profs(data);
-            prof_list.innerHTML = listed.join(' ');
-            
+
+            const {labels: profLabels, dataForChart: profData, listed: profListed} 
+            = profs(data);
+
+            const {labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } 
+            = getMeetings(data)
+            prof_list.innerHTML = profListed.join(' ');
+            meetings_list.innerHTML = meetingListed.join(' ');
             /* console.log('gen_ed_list before: ', gen_ed_list);
             const {labels: genEdlabels, dataForChart: genEdData, listed: genEdlisted} 
             = genEds(data);
@@ -105,10 +137,11 @@ async function mainEvent() {
                 myChart.destroy();
             }
 
-            myChart = initChart(chart,labels,dataForChart);
+            myChart = initChart(chart, profLabels, profData);
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'
+            meetings_list.innerHTML = 'Error occured try again'
         }
     });
 

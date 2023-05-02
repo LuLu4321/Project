@@ -86,6 +86,9 @@ function getMeetings(data){
 
 async function mainEvent() {
 
+  const filterType = document.querySelector('#filter-type');
+  const sectionsFilter = document.querySelector('#sections-filter');
+
     const form = document.querySelector('form');
     const input = document.querySelector('input');
     let prof_list = document.querySelector('.prof_list');
@@ -112,13 +115,21 @@ async function mainEvent() {
             if (myChart != null) {
                 myChart.destroy();
             }
-
             myChart = initChart(chart, profLabels, profData);
+
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'
             meetings_list.innerHTML = 'Error occured try again'
         }
+    });
+
+    filterType.addEventListener('change', (event) => {
+      if (event.target.value === 'sections') {
+        sectionsFilter.style.display = 'block';
+      } else {
+        sectionsFilter.style.display = 'none';
+      }
     });
 
 }

@@ -20,6 +20,36 @@
             <label> Course Name</label>
             <input type="text"/>
             <button type="submit">Search</button>
+          </form>
+          <br>
+          <h3>Filter Information</h3>
+          <form action="/api" class="box">
+            <div class="filter">
+              <label for="filter-type">Filter by:</label>
+               <select id="filter-type">
+                 <option value="professors">Professors</option>
+                 <option value="meetings">Meetings</option>
+                 <option value="sections">Sections</option>
+               </select>
+            </div>
+            <br>
+            <div id="sections-filter" style="display:none;">
+              <select id="sections">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+            <br>
+            <button id="filter-button">Filter</button>
+          </form>
         </div>
 
           <div class="box right_section">
@@ -28,7 +58,8 @@
             </div>
             <h3>Known Professors</h3>
             <div class="prof_list">A list of Professors</div>
-            <h4>Meetings</h4>
+            <br>
+            <h3>Meetings</h3>
             <div class="meetings">Meetings Schedule</div>
           </div>
 

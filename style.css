@@ -138,6 +138,23 @@ form {
   padding: 1.5rem;
 }
 
+
+#filter-button {
+  margin-left: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  background-color: #4CAF50;
+  color: rgb(255, 255, 255);
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#filter-button:hover {
+  background-color: #3e8e41;
+}
+
+
 .right_section {
   background-color: #fff422;
   flex: 1 2 auto;

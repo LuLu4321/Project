@@ -84,94 +84,133 @@ function getMeetings(data){
   return { labels, dataForChart, listed };
 }
 
-function filterData(data, filterType){
-  if (filterType === 'Professors'){
-    const { labels: profLabels, dataForChart: profData, listed: profListed } = profs(data);
-    return {
-      labels: profLabels,
-      dataForChart: profData,
-      listed: profListed,
-    };
-  } else if (filterType === 'Meetings') {
-    const { labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } = getMeetings(data);
-    return {
-      labels: meetingLabels,
-      dataForChart: meetingData,
-      listed: meetingListed,
-    };
-  }
-  return null;
-}
+
 
 async function mainEvent() {
-
   const filterType = document.querySelector('#filter-type');
   const sectionsFilter = document.querySelector('#sections-filter');
+  const filterButton = document.querySelector('#filter-button');
+  const sectionsDropdown = document.querySelector('#sections');
+  const form = document.querySelector('form');
+  const input = document.querySelector('input');
+  const profList = document.querySelector('.prof_list');
+  const meetingsList = document.querySelector('.meetings');
+  const chart = document.querySelector('#myChart');
+  let myChart = null;
 
-    const form = document.querySelector('form');
-    const input = document.querySelector('input');
-    let prof_list = document.querySelector('.prof_list');
-    let meetings_list = document.querySelector('.meetings');
-    const chart = document.querySelector('#myChart');
-    let myChart = null;
+  filterType.addEventListener('change', (event) => {
+    if (event.target.value === 'sections') {
+      sectionsFilter.style.display = 'block';
+    } else {
+      sectionsFilter.style.display = 'none';
+    }
+  });
 
-    const course_name = input.value;
-    const response = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
-    const data = await response.json();
-    console.log(data);
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      const courseName = input.value;
+      const response = await fetch(`https://api.umd.io/v1/courses/${courseName}/sections`);
+      const data = await response.json();
 
-    const filteredData = filterData(data, filterType.value);
+      const { labels: profLabels, dataForChart: profData, listed: profListed } = profs(data);
+      const { labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } = getMeetings(data);
+      profList.innerHTML = profListed.join(' ');
+      meetingsList.innerHTML = meetingListed.join(' ');
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
-        try {
+      if (myChart != null) {
+        myChart.destroy();
+      }
+      myChart = initChart(chart, profLabels, profData);
 
-            const {labels: profLabels, dataForChart: profData, listed: profListed} 
-            = profs(data);
 
-            const {labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } 
-            = getMeetings(data)
-            prof_list.innerHTML = profListed.join(' ');
-            meetings_list.innerHTML = meetingListed.join(' ');
-            
-            if (myChart != null) {
-                myChart.destroy();
+
+      filterButton.addEventListener('click', () => {
+        if (filterType.value === 'professors') {
+          profList.innerHTML = profListed.join(' ');
+          meetingsList.innerHTML = '';
+        } else if (filterType.value === 'meetings'){
+          meetingsList.innerHTML = meetingListed.join(' ');
+          profList.innerHTML = '';
+          myChart.destroy();
+        } else if (filterType.value === 'sections'){
+          const numSections = parseInt(sectionsDropdown.value);
+          let filteredProfList = [];
+          let filteredMeetingList = [];
+
+          for (let i = 0; i < profListed.length; i++) {
+            const sectionCount = parseInt(profListed[i].match(/\((\d+) sections\)/)[1]);
+            if (sectionCount === numSections) {
+            filteredProfList.push(profListed[i]);
+           }
+          }
+          profList.innerHTML = filteredProfList.join(' ');
+
+          for (let i = 0; i < meetingListed.length; i++) {
+            const sectionCount = parseInt(meetingListed[i].match(/\((\d+) sections\)/)[1]);
+            if (sectionCount === numSections) {
+            filteredMeetingList.push(meetingListed[i]);
             }
-            myChart = initChart(chart, profLabels, profData);
-
-            
-        } catch (error){
-            console.error(error);
-            prof_list.innerHTML = 'Error occured try again'
-            meetings_list.innerHTML = 'Error occured try again'
-        }
-    });
-
-    filterType.addEventListener('change', (event) => {
-      if (event.target.value === 'sections') {
-        sectionsFilter.style.display = 'block';
-      } else {
-        sectionsFilter.style.display = 'none';
-      }
-    });
-
-    filterType.addEventListener('change', () => {
-      if (filteredData !== null) {
-        prof_list.innerHTML = filteredData.listed.join(" ");
-        meetings_list.innerHTML = "";
-        if (myChart != null) {
+          }
+          meetingsList.innerHTML = filteredMeetingList.join(' ');
           myChart.destroy();
-        }
-        myChart = initChart(chart, filteredData.labels, filteredData.dataForChart);
-      } else {
-        prof_list.innerHTML = "";
-        meetings_list.innerHTML = "";
-        if (myChart != null) {
-          myChart.destroy();
-        }
-      }
-    });
 
+        }  
+               /*
+                for (let i = 0; i < meetingListed.length; i++) {
+            filteredMeetingList = meetingListed.filter((meeting) => meeting.includes(`${i} sections`));
+          }
+          if (numSections === 1) {
+          const filteredProfessors = profListed.filter((professor) => professor.includes('(1 section)'));
+          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(1 section)'));
+          profList.innerHTML = filteredProfessors.join(' ');
+          meetingsList.innerHTML = filteredMeetings.join(' ');
+          } else if (numSections === 2) {
+          const filteredProfessors = profListed.filter((professor) => professor.includes('(2 sections)'));
+          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(2 sections)'));
+          profList.innerHTML = filteredProfessors.join(' ');
+          meetingsList.innerHTML = filteredMeetings.join(' ');
+          } else if (numSections === 3) {
+          const filteredProfessors = profListed.filter((professor) => professor.includes('(3 sections)'));
+          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(3 sections)'));
+          profList.innerHTML = filteredProfessors.join(' ');
+          meetingsList.innerHTML = filteredMeetings.join(' ');
+          } else if (numSections === 4) {
+          const filteredProfessors = profListed.filter((professor) => professor.includes('(4 sections)'));
+          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(4 sections)'));
+          profList.innerHTML = filteredProfessors.join(' ');
+          meetingsList.innerHTML = filteredMeetings.join(' ');
+        } else if (numSections === 5) {
+        const filteredProfessors = profListed.filter((professor) => professor.includes('(5 sections)'));
+        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(5 sections)'));
+        profList.innerHTML = filteredProfessors.join(' ');
+        meetingsList.innerHTML = filteredMeetings.join(' ');
+        } else if (numSections === 6) {
+        const filteredProfessors = profListed.filter((professor) => professor.includes('(6 sections)'));
+        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(6 sections)'));
+        profList.innerHTML = filteredProfessors.join(' ');
+        meetingsList.innerHTML = filteredMeetings.join(' ');
+      } else if (numSections === 7) {
+        const filteredProfessors = profListed.filter((professor) => professor.includes('(7 sections)'));
+        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(7 sections)'));
+        profList.innerHTML = filteredProfessors.join(' ');
+        meetingsList.innerHTML = filteredMeetings.join(' ');
+      } else if (numSections === 8) {
+      const filteredProfessors = profListed.filter((professor) => professor.includes('(8 sections)'));
+      const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(8 sections)'));
+      profList.innerHTML = filteredProfessors.join(' ');
+      meetingsList.innerHTML = filteredMeetings.join(' ');
+  
+  }
+  */
+      });
+
+    } catch (error) {
+      console.error(error);
+      profList.innerHTML = 'Error occurred, try again';
+      meetingsList.innerHTML = 'Error occurred, try again';
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async () => mainEvent());

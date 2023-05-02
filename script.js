@@ -84,6 +84,25 @@ function getMeetings(data){
   return { labels, dataForChart, listed };
 }
 
+function filterData(data, filterType){
+  if (filterType === 'Professors'){
+    const { labels: profLabels, dataForChart: profData, listed: profListed } = profs(data);
+    return {
+      labels: profLabels,
+      dataForChart: profData,
+      listed: profListed,
+    };
+  } else if (filterType === 'Meetings') {
+    const { labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } = getMeetings(data);
+    return {
+      labels: meetingLabels,
+      dataForChart: meetingData,
+      listed: meetingListed,
+    };
+  }
+  return null;
+}
+
 async function mainEvent() {
 
   const filterType = document.querySelector('#filter-type');
@@ -96,13 +115,16 @@ async function mainEvent() {
     const chart = document.querySelector('#myChart');
     let myChart = null;
 
+    const course_name = input.value;
+    const response = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
+    const data = await response.json();
+    console.log(data);
+
+    const filteredData = filterData(data, filterType.value);
+
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const course_name = input.value;
         try {
-            const response = await fetch(`https://api.umd.io/v1/courses/${course_name}/sections`);
-            const data = await response.json();
-            console.log(data);
 
             const {labels: profLabels, dataForChart: profData, listed: profListed} 
             = profs(data);
@@ -117,6 +139,7 @@ async function mainEvent() {
             }
             myChart = initChart(chart, profLabels, profData);
 
+            
         } catch (error){
             console.error(error);
             prof_list.innerHTML = 'Error occured try again'
@@ -129,6 +152,23 @@ async function mainEvent() {
         sectionsFilter.style.display = 'block';
       } else {
         sectionsFilter.style.display = 'none';
+      }
+    });
+
+    filterType.addEventListener('change', () => {
+      if (filteredData !== null) {
+        prof_list.innerHTML = filteredData.listed.join(" ");
+        meetings_list.innerHTML = "";
+        if (myChart != null) {
+          myChart.destroy();
+        }
+        myChart = initChart(chart, filteredData.labels, filteredData.dataForChart);
+      } else {
+        prof_list.innerHTML = "";
+        meetings_list.innerHTML = "";
+        if (myChart != null) {
+          myChart.destroy();
+        }
       }
     });
 

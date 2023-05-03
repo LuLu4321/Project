@@ -20,6 +20,19 @@
             <label> Course Name</label>
             <input type="text"/>
             <button type="submit">Search</button>
+          </form>
+          <br>
+          <h3>Filter Information</h3>
+            <div class="filter">
+              <label for="filter-type">Filter by:</label>
+               <select id="filter-type">
+                 <option value="none">None</option>
+                 <option value="professors">Professors</option>
+                 <option value="meetings">Meetings</option>
+               </select>
+            </div>
+            <br>
+            <button id="filter-button">Filter</button>
         </div>
 
           <div class="box right_section">
@@ -28,6 +41,12 @@
             </div>
             <h3>Known Professors</h3>
             <div class="prof_list">A list of Professors</div>
+            <br>
+            <div>
+              <canvas id="meetingChart"></canvas>
+            </div>
+            <h3>Meetings</h3>
+            <div class="meetings">Meetings Schedule</div>
           </div>
 
       </div>

@@ -23,6 +23,7 @@ function profs(data){
 }
 
 function initChart (target, labels, y_val){
+  
   const chart = new Chart(target, {
     type: 'bar',
     data: {
@@ -52,12 +53,8 @@ function getMeetings(data){
     }
 
     const {days, start_time, end_time} = meeting;
-    const startHour = parseInt(start_time.substring(0, 2));
-    const endHour = parseInt(end_time.substring(0, 2));
-    const startSuffix = startHour >= 12 ? "pm" : "am";
-    const endSuffix = endHour >= 12 ? "pm" : "am";
-    const startTime = `${start_time.substring(0, 5)}${startSuffix}`;
-    const endTime = `${end_time.substring(0, 5)}${endSuffix}`;
+    const startTime = `${start_time.substring(0, 7)}`
+    const endTime = `${end_time.substring(0, 7)}`;
     const time = `${startTime}-${endTime}`;
     if(accum[days]){
       if(accum[days][time]){
@@ -88,23 +85,15 @@ function getMeetings(data){
 
 async function mainEvent() {
   const filterType = document.querySelector('#filter-type');
-  const sectionsFilter = document.querySelector('#sections-filter');
   const filterButton = document.querySelector('#filter-button');
-  const sectionsDropdown = document.querySelector('#sections');
   const form = document.querySelector('form');
   const input = document.querySelector('input');
   const profList = document.querySelector('.prof_list');
   const meetingsList = document.querySelector('.meetings');
   const chart = document.querySelector('#myChart');
   let myChart = null;
-
-  filterType.addEventListener('change', (event) => {
-    if (event.target.value === 'sections') {
-      sectionsFilter.style.display = 'block';
-    } else {
-      sectionsFilter.style.display = 'none';
-    }
-  });
+  const meetingchart = document.querySelector('#meetingChart');
+  let myMeetingchart = null;
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -123,86 +112,30 @@ async function mainEvent() {
       }
       myChart = initChart(chart, profLabels, profData);
 
+      if (myMeetingchart != null) {
+        myMeetingchart.destroy();
+      }
+      myMeetingchart = initChart(meetingchart, meetingLabels, meetingData);
+
 
 
       filterButton.addEventListener('click', () => {
         if (filterType.value === 'professors') {
           profList.innerHTML = profListed.join(' ');
           meetingsList.innerHTML = '';
+          chart.style.display = 'block';
+          meetingchart.style.display = 'none';
         } else if (filterType.value === 'meetings'){
           meetingsList.innerHTML = meetingListed.join(' ');
           profList.innerHTML = '';
-          myChart.destroy();
-        } else if (filterType.value === 'sections'){
-          const numSections = parseInt(sectionsDropdown.value);
-          let filteredProfList = [];
-          let filteredMeetingList = [];
-
-          for (let i = 0; i < profListed.length; i++) {
-            const sectionCount = parseInt(profListed[i].match(/\((\d+) sections\)/)[1]);
-            if (sectionCount === numSections) {
-            filteredProfList.push(profListed[i]);
-           }
-          }
-          profList.innerHTML = filteredProfList.join(' ');
-
-          for (let i = 0; i < meetingListed.length; i++) {
-            const sectionCount = parseInt(meetingListed[i].match(/\((\d+) sections\)/)[1]);
-            if (sectionCount === numSections) {
-            filteredMeetingList.push(meetingListed[i]);
-            }
-          }
-          meetingsList.innerHTML = filteredMeetingList.join(' ');
-          myChart.destroy();
-
-        }  
-               /*
-                for (let i = 0; i < meetingListed.length; i++) {
-            filteredMeetingList = meetingListed.filter((meeting) => meeting.includes(`${i} sections`));
-          }
-          if (numSections === 1) {
-          const filteredProfessors = profListed.filter((professor) => professor.includes('(1 section)'));
-          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(1 section)'));
-          profList.innerHTML = filteredProfessors.join(' ');
-          meetingsList.innerHTML = filteredMeetings.join(' ');
-          } else if (numSections === 2) {
-          const filteredProfessors = profListed.filter((professor) => professor.includes('(2 sections)'));
-          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(2 sections)'));
-          profList.innerHTML = filteredProfessors.join(' ');
-          meetingsList.innerHTML = filteredMeetings.join(' ');
-          } else if (numSections === 3) {
-          const filteredProfessors = profListed.filter((professor) => professor.includes('(3 sections)'));
-          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(3 sections)'));
-          profList.innerHTML = filteredProfessors.join(' ');
-          meetingsList.innerHTML = filteredMeetings.join(' ');
-          } else if (numSections === 4) {
-          const filteredProfessors = profListed.filter((professor) => professor.includes('(4 sections)'));
-          const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(4 sections)'));
-          profList.innerHTML = filteredProfessors.join(' ');
-          meetingsList.innerHTML = filteredMeetings.join(' ');
-        } else if (numSections === 5) {
-        const filteredProfessors = profListed.filter((professor) => professor.includes('(5 sections)'));
-        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(5 sections)'));
-        profList.innerHTML = filteredProfessors.join(' ');
-        meetingsList.innerHTML = filteredMeetings.join(' ');
-        } else if (numSections === 6) {
-        const filteredProfessors = profListed.filter((professor) => professor.includes('(6 sections)'));
-        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(6 sections)'));
-        profList.innerHTML = filteredProfessors.join(' ');
-        meetingsList.innerHTML = filteredMeetings.join(' ');
-      } else if (numSections === 7) {
-        const filteredProfessors = profListed.filter((professor) => professor.includes('(7 sections)'));
-        const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(7 sections)'));
-        profList.innerHTML = filteredProfessors.join(' ');
-        meetingsList.innerHTML = filteredMeetings.join(' ');
-      } else if (numSections === 8) {
-      const filteredProfessors = profListed.filter((professor) => professor.includes('(8 sections)'));
-      const filteredMeetings = meetingListed.filter((meeting) => meeting.includes('(8 sections)'));
-      profList.innerHTML = filteredProfessors.join(' ');
-      meetingsList.innerHTML = filteredMeetings.join(' ');
-  
-  }
-  */
+          meetingchart.style.display = 'block';
+          chart.style.display = 'none';
+        } else if (filterType.value === 'none'){
+          profList.innerHTML = profListed.join(' ');
+          meetingsList.innerHTML = meetingListed.join(' ');
+          chart.style.display = 'block';
+          meetingchart.style.display = 'block';
+        }
       });
 
     } catch (error) {

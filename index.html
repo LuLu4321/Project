@@ -29,23 +29,7 @@
                  <option value="none">None</option>
                  <option value="professors">Professors</option>
                  <option value="meetings">Meetings</option>
-                 <option value="sections">Sections</option>
                </select>
-            </div>
-            <br>
-            <div id="sections-filter" style="display:none;">
-              <select id="sections">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
-              </select>
             </div>
             <br>
             <button id="filter-button">Filter</button>
@@ -58,6 +42,9 @@
             <h3>Known Professors</h3>
             <div class="prof_list">A list of Professors</div>
             <br>
+            <div>
+              <canvas id="meetingChart"></canvas>
+            </div>
             <h3>Meetings</h3>
             <div class="meetings">Meetings Schedule</div>
           </div>

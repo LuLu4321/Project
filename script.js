@@ -95,6 +95,13 @@ async function mainEvent() {
   const meetingchart = document.querySelector('#meetingChart');
   let myMeetingchart = null;
 
+  const clearDataButton = document.querySelector('#data_clear');
+  
+  clearDataButton.addEventListener('click', () => {
+    localStorage.clear();
+    location.reload();
+  });
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
@@ -104,6 +111,10 @@ async function mainEvent() {
 
       const { labels: profLabels, dataForChart: profData, listed: profListed } = profs(data);
       const { labels: meetingLabels, dataForChart: meetingData, listed: meetingListed } = getMeetings(data);
+
+      localStorage.setItem('profListed', JSON.stringify(profListed));
+      localStorage.setItem('meetingListed', JSON.stringify(meetingListed));
+
       profList.innerHTML = profListed.join(' ');
       meetingsList.innerHTML = meetingListed.join(' ');
 
@@ -117,33 +128,36 @@ async function mainEvent() {
       }
       myMeetingchart = initChart(meetingchart, meetingLabels, meetingData);
 
-
-
-      filterButton.addEventListener('click', () => {
-        if (filterType.value === 'professors') {
-          profList.innerHTML = profListed.join(' ');
-          meetingsList.innerHTML = '';
-          chart.style.display = 'block';
-          meetingchart.style.display = 'none';
-        } else if (filterType.value === 'meetings'){
-          meetingsList.innerHTML = meetingListed.join(' ');
-          profList.innerHTML = '';
-          meetingchart.style.display = 'block';
-          chart.style.display = 'none';
-        } else if (filterType.value === 'none'){
-          profList.innerHTML = profListed.join(' ');
-          meetingsList.innerHTML = meetingListed.join(' ');
-          chart.style.display = 'block';
-          meetingchart.style.display = 'block';
-        }
-      });
-
     } catch (error) {
       console.error(error);
       profList.innerHTML = 'Error occurred, try again';
       meetingsList.innerHTML = 'Error occurred, try again';
     }
   });
+
+
+  filterButton.addEventListener('click', () => {
+    const profListed = JSON.parse(localStorage.getItem('profListed'));
+    const meetingListed = JSON.parse(localStorage.getItem('meetingListed'));
+
+    if (filterType.value === 'professors') {
+      profList.innerHTML = profListed.join(' ');
+      meetingsList.innerHTML = '';
+      chart.style.display = 'block';
+      meetingchart.style.display = 'none';
+    } else if (filterType.value === 'meetings'){
+      meetingsList.innerHTML = meetingListed.join(' ');
+      profList.innerHTML = '';
+      meetingchart.style.display = 'block';
+      chart.style.display = 'none';
+    } else if (filterType.value === 'none'){
+      profList.innerHTML = profListed.join(' ');
+      meetingsList.innerHTML = meetingListed.join(' ');
+      chart.style.display = 'block';
+      meetingchart.style.display = 'block';
+    }
+  });
+
 }
 
 document.addEventListener('DOMContentLoaded', async () => mainEvent());

@@ -175,6 +175,21 @@ form input {
     margin-bottom: 0.5rem;
   }
 
+  .grid img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .footer {
+    flex-shrink: 0;
+    padding: 1rem;
+    background-color: #fc4545;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 2px solid #000000;
+  }
+  
+
 @media only screen and (max-width: 736px){
     .container {
       background-color: #f688c1;
